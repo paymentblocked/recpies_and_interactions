@@ -48,41 +48,21 @@ Here are the first few rows of the cleaned DataFrame:
 
 ### Univariate Analysis
 
-<iframe
-  src="assets/avg-rating-distribution.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<iframe src="assets/avg-rating-distribution.html" width="800" height="600" frameborder="0"></iframe>
 
 The distribution of average ratings is heavily left-skewed, with most recipes sitting between 4 and 5 stars. This reflects a strong positivity bias on Food.com -- people tend to rate recipes they liked, and recipes they disliked often go unreviewed.
 
-<iframe
-  src="assets/n-steps-distribution.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<iframe src="assets/n-steps-distribution.html" width="800" height="600" frameborder="0"></iframe>
 
 The number of steps per recipe is right-skewed. Most recipes have fewer than 15 steps, with a long tail stretching out past 40. Simple recipes dominate the platform.
 
 ### Bivariate Analysis
 
-<iframe
-  src="assets/rating-by-steps.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<iframe src="assets/rating-by-steps.html" width="800" height="600" frameborder="0"></iframe>
 
 When we bin recipes by step count and look at the distribution of ratings within each bin, the medians and quartiles are remarkably similar across all groups. There is no obvious visual trend suggesting that more complex recipes receive lower (or higher) ratings.
 
-<iframe
-  src="assets/rating-vs-ingredients.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<iframe src="assets/rating-vs-ingredients.html" width="800" height="600" frameborder="0"></iframe>
 
 A scatter plot of average rating against number of ingredients (with a LOWESS trendline) shows an essentially flat relationship. Ingredient count does not appear to predict rating in any meaningful way.
 
@@ -118,31 +98,29 @@ We ran two permutation tests to check whether the missingness of `avg_rating` de
 
 - Null hypothesis: The distribution of `n_steps` is the same whether `avg_rating` is missing or not.
 - Alternative hypothesis: The distributions differ.
-- Result: We rejected the null hypothesis (p < 0.05). The missingness of `avg_rating` does depend on `n_steps`. Recipes with missing ratings tend to have a different step count distribution than recipes with ratings present.
+- Mean `n_steps` when rating is missing: 11.47
+- Mean `n_steps` when rating is observed: 10.03
+- Observed absolute difference in means: 1.44
+- P-value: < 0.001
+- Result: We rejected the null hypothesis. The missingness of `avg_rating` does depend on `n_steps`. Recipes with missing ratings tend to have more steps on average, which makes sense -- more complex recipes may attract fewer reviewers.
 
-<iframe
-  src="assets/missingness-steps.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<iframe src="assets/missingness-steps.html" width="800" height="600" frameborder="0"></iframe>
 
-The plot above shows the empirical distribution of the test statistic under the null, with the observed statistic marked by the red dashed line. The observed difference falls well outside the bulk of the permutation distribution, confirming the dependency.
+The plot above shows the empirical distribution of the test statistic under the null, with the observed statistic marked by the red dashed line. The observed difference falls well outside the permutation distribution, confirming the dependency.
 
 **Test 2: Missingness of `avg_rating` vs. `calories`**
 
 - Null hypothesis: The distribution of `calories` is the same whether `avg_rating` is missing or not.
 - Alternative hypothesis: The distributions differ.
-- Result: We failed to reject the null hypothesis (p > 0.05). The missingness of `avg_rating` does not appear to depend on calorie count.
+- Mean calories when rating is missing: 510.01
+- Mean calories when rating is observed: 425.16
+- Observed absolute difference in means: 84.85
+- P-value: < 0.001
+- Result: We rejected the null hypothesis. The missingness of `avg_rating` also depends on `calories`. Recipes with missing ratings tend to be higher in calories, suggesting that more extreme or indulgent recipes are less likely to be reviewed.
 
-<iframe
-  src="assets/missingness-calories.html"
-  width="800"
-  height="600"
-  frameborder="0"
-></iframe>
+<iframe src="assets/missingness-calories.html" width="800" height="600" frameborder="0"></iframe>
 
-Here the observed difference sits comfortably within the permutation distribution, consistent with the null hypothesis that calorie count and rating missingness are unrelated.
+The observed calorie difference also falls far outside the permutation distribution, confirming that the missingness of ratings depends on calorie count as well.
 
 ---
 
@@ -226,9 +204,13 @@ We added two engineered features and switched to a non-linear model:
 **Hyperparameter tuning:** We used 5-fold cross-validation with `GridSearchCV` to tune `max_depth` over the values [5, 10, 15, 20, 30, None]. Tree depth directly controls the bias-variance tradeoff -- too shallow and the model underfits, too deep and it memorizes training noise.
 
 **Performance:**
-- The best `max_depth` was selected by cross-validation based on the lowest RMSE.
-- The final model's test RMSE improved over the baseline model's test RMSE of 0.6425.
-- While the improvement is modest (reflecting the fundamental difficulty of predicting ratings from recipe metadata alone), the Random Forest with engineered features consistently outperforms the baseline across cross-validation folds.
+- Best `max_depth`: 5
+- Training RMSE: 0.6360
+- Test RMSE: 0.6413
+- Baseline model test RMSE: 0.6425
+- Improvement: 0.0012
+
+The final model's test RMSE of 0.6413 is an improvement over the baseline's 0.6425. The improvement is small in absolute terms, which reflects the fundamental difficulty of predicting ratings from recipe metadata alone -- as our earlier analysis showed, ratings barely vary with complexity. That said, the Random Forest with engineered features and a shallow max depth of 5 does consistently outperform the linear baseline, and the gap between training and test RMSE (0.6360 vs. 0.6413) shows the model generalizes reasonably without heavy overfitting.
 
 ---
 
@@ -246,4 +228,10 @@ We tested whether our final model performs equally well for low-calorie and high
 
 We ran a permutation test with 1,000 iterations, shuffling the calorie group labels each time and recomputing the RMSE difference.
 
-**Result:** We fail to reject the null hypothesis at the 0.05 significance level. The observed RMSE difference between the two groups falls within the range we would expect under random chance. There is not sufficient evidence to conclude that the model performs unfairly across calorie groups.
+**Results:**
+- RMSE for low-calorie recipes: 0.6473
+- RMSE for high-calorie recipes: 0.6353
+- Observed difference (high minus low): -0.0120
+- P-value: 0.782
+
+The observed difference is actually negative, meaning the model performs slightly better on high-calorie recipes, not worse. With a p-value of 0.782, this difference is well within the range we would expect from random chance. We fail to reject the null hypothesis at the 0.05 significance level. There is not sufficient evidence to conclude that the model performs unfairly across calorie groups.
