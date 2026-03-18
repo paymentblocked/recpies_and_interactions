@@ -92,7 +92,7 @@ If we had access to page view or impression data for each recipe, we could condi
 
 ### Missingness Dependency
 
-We ran three permutation tests to check whether the missingness of `avg_rating` depends on other observed columns, using the absolute difference in group means as our test statistic and a significance level of 0.05.
+We ran two permutation tests to check whether the missingness of `avg_rating` depends on other observed columns, using the absolute difference in group means as our test statistic and a significance level of 0.05.
 
 **Test 1: Missingness of `avg_rating` vs. `n_steps`**
 
@@ -108,7 +108,7 @@ We ran three permutation tests to check whether the missingness of `avg_rating` 
 
 The plot above shows the empirical distribution of the test statistic under the null, with the observed statistic marked by the red dashed line. The observed difference falls well outside the permutation distribution, confirming the dependency.
 
-**Test 2: Missingness of `avg_rating` vs. `calories` (dependent)**
+**Test 2: Missingness of `avg_rating` vs. `calories`**
 
 - Null hypothesis: The distribution of `calories` is the same whether `avg_rating` is missing or not.
 - Alternative hypothesis: The distributions differ.
@@ -122,17 +122,17 @@ The plot above shows the empirical distribution of the test statistic under the 
 
 The observed calorie difference also falls far outside the permutation distribution, confirming that the missingness of ratings depends on calorie count as well.
 
-**Test 3: Missingness of `avg_rating` vs. `sodium` (not dependent)**
+**Test 3: Missingness of `avg_rating` vs. `sugar` (not dependent)**
 
-- Null hypothesis: The distribution of `sodium` is the same whether `avg_rating` is missing or not.
+- Null hypothesis: The distribution of `sugar` is the same whether `avg_rating` is missing or not.
 - Alternative hypothesis: The distributions differ.
-- Mean `sodium` when rating is missing: 27.85
-- Mean `sodium` when rating is observed: 28.62
-- Observed absolute difference in means: 0.77
-- P-value: 0.746
-- Result: We fail to reject the null hypothesis. The missingness of `avg_rating` does not depend on `sodium`. Sodium content is essentially the same for recipes with and without ratings, confirming that not all nutritional features are associated with missingness.
+- Mean `sugar` when rating is missing: 92.73
+- Mean `sugar` when rating is observed: 66.79
+- Observed absolute difference in means: 25.94
+- P-value: < 0.001
+- Result: We rejected the null hypothesis. The missingness of `avg_rating` does depend on `sugar`. Recipes with missing ratings tend to have higher sugar content on average.
 
-<iframe src="assets/missingness-sodium.html" width="800" height="600" frameborder="0"></iframe>
+<iframe src="assets/missingness-sugar.html" width="800" height="600" frameborder="0"></iframe>
 
 ---
 
@@ -151,9 +151,9 @@ We chose a permutation test because it makes no distributional assumptions about
 - Mean rating for low-step recipes (9 steps or fewer): 4.6266
 - Mean rating for high-step recipes (more than 9 steps): 4.6234
 - Observed difference: 0.0032
-- P-value: 0.224
+- P-value: 0.238
 
-We fail to reject the null hypothesis. The observed difference of 0.003 stars is tiny, and the p-value of 0.224 tells us a difference this large or larger would appear about 22% of the time by random chance alone. There is not enough evidence to conclude that complex recipes receive lower ratings.
+We fail to reject the null hypothesis. The observed difference of 0.003 stars is tiny, and the p-value of 0.238 tells us a difference this large or larger would appear about 24% of the time by random chance alone. There is not enough evidence to conclude that complex recipes receive lower ratings.
 
 ---
 
@@ -244,8 +244,8 @@ We ran a permutation test with 1,000 iterations, shuffling the calorie group lab
 - RMSE for low-calorie recipes: 0.6473
 - RMSE for high-calorie recipes: 0.6353
 - Observed difference (high minus low): -0.0120
-- P-value: 0.777
+- P-value: 0.782
 
-The observed difference is actually negative, meaning the model performs slightly better on high-calorie recipes, not worse. With a p-value of 0.777, this difference is well within the range we would expect from random chance. We fail to reject the null hypothesis at the 0.05 significance level. There is not sufficient evidence to conclude that the model performs unfairly across calorie groups.
+The observed difference is actually negative, meaning the model performs slightly better on high-calorie recipes, not worse. With a p-value of 0.782, this difference is well within the range we would expect from random chance. We fail to reject the null hypothesis at the 0.05 significance level. There is not sufficient evidence to conclude that the model performs unfairly across calorie groups.
 
 <iframe src="assets/fairness-analysis.html" width="800" height="600" frameborder="0"></iframe>
