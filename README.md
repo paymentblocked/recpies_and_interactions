@@ -112,8 +112,8 @@ The plot above shows the empirical distribution of the test statistic under the 
 
 - Null hypothesis: The distribution of `calories` is the same whether `avg_rating` is missing or not.
 - Alternative hypothesis: The distributions differ.
-- Mean calories when rating is missing: 510.01
-- Mean calories when rating is observed: 425.16
+- Mean `calories` when rating is missing: 510.01
+- Mean `calories` when rating is observed: 425.16
 - Observed absolute difference in means: 84.85
 - P-value: < 0.001
 - Result: We rejected the null hypothesis. The missingness of `avg_rating` also depends on `calories`. Recipes with missing ratings tend to be higher in calories, suggesting that more extreme or indulgent recipes are less likely to be reviewed.
@@ -126,9 +126,11 @@ The observed calorie difference also falls far outside the permutation distribut
 
 - Null hypothesis: The distribution of `sugar` is the same whether `avg_rating` is missing or not.
 - Alternative hypothesis: The distributions differ.
-- Test statistic: Absolute difference in group means.
-- Significance level: 0.05
-- Result: We fail to reject the null hypothesis. The missingness of `avg_rating` does not depend on `sugar`. Sugar content is a nutritional attribute that does not drive whether a recipe attracts reviewers, so it is unsurprising that missing and observed recipes have similar sugar distributions.
+- Mean `sugar` when rating is missing: 92.73
+- Mean `sugar` when rating is observed: 66.79
+- Observed absolute difference in means: 25.94
+- P-value: < 0.001
+- Result: We rejected the null hypothesis. The missingness of `avg_rating` does depend on `sugar`. Recipes with missing ratings tend to have higher sugar content on average.
 
 <iframe src="assets/missingness-sugar.html" width="800" height="600" frameborder="0"></iframe>
 
