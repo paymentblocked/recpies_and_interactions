@@ -122,6 +122,16 @@ The plot above shows the empirical distribution of the test statistic under the 
 
 The observed calorie difference also falls far outside the permutation distribution, confirming that the missingness of ratings depends on calorie count as well.
 
+**Test 3: Missingness of `avg_rating` vs. `sugar` (not dependent)**
+
+- Null hypothesis: The distribution of `sugar` is the same whether `avg_rating` is missing or not.
+- Alternative hypothesis: The distributions differ.
+- Test statistic: Absolute difference in group means.
+- Significance level: 0.05
+- Result: We fail to reject the null hypothesis. The missingness of `avg_rating` does not depend on `sugar`. Sugar content is a nutritional attribute that does not drive whether a recipe attracts reviewers, so it is unsurprising that missing and observed recipes have similar sugar distributions.
+
+<iframe src="assets/missingness-sugar.html" width="800" height="600" frameborder="0"></iframe>
+
 ---
 
 ## Hypothesis Testing
@@ -235,3 +245,5 @@ We ran a permutation test with 1,000 iterations, shuffling the calorie group lab
 - P-value: 0.782
 
 The observed difference is actually negative, meaning the model performs slightly better on high-calorie recipes, not worse. With a p-value of 0.782, this difference is well within the range we would expect from random chance. We fail to reject the null hypothesis at the 0.05 significance level. There is not sufficient evidence to conclude that the model performs unfairly across calorie groups.
+
+<iframe src="assets/fairness-analysis.html" width="800" height="600" frameborder="0"></iframe>
